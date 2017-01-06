@@ -1,0 +1,897 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Ballistix vs Fnatic - Fall Global Championship - Heroes of the Storm</title>
+    <meta name="keywords" content="HotS, Heroes of the Storm, tournament, eSport, game, match, player, team, hero, stat, statistics, winrate, draft, VOD, meta, meta-report, playoff, masterleague, pick, ban, score, result">
+    <meta name="description" content="Match result, draft, pick and bans, VODs, replay, comments and related games.">
+    <link rel="icon" type="image/png" href="http://c.masterleague.net/static/favicon.ico" />
+
+    <link rel="stylesheet" href="http://c.masterleague.net/static/css/normalize.css">
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+    <!-- Latest compiled and minified JavaScript -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="http://c.masterleague.net/static/css/default.css?181016">
+
+    <script src="http://c.masterleague.net/static/typeahead/js/typeahead.bundle.min.js"></script>
+    <script src="http://c.masterleague.net/static/groups/js/handlebars.1.0.0.js"></script>
+    <link rel="stylesheet" href="http://c.masterleague.net/static/typeahead/css/typeahead.css">
+
+    <script src="http://c.masterleague.net/static/bootstrap-switch/js/bootstrap-switch.min.js"></script>
+    <link rel="stylesheet" href="http://c.masterleague.net/static/bootstrap-switch/css/bootstrap-switch.min.css">
+
+    <script src="http://c.masterleague.net/static/js/js.cookie.js"></script>
+
+    <script type="text/javascript">
+        //<![CDATA[
+        $(document).ready(function () {
+            $('.nav-tabs a').click(function () {
+                $(this).blur();
+            });
+
+            $('a.setlang').click(function (e) {
+                e.preventDefault();
+                var lang = $(this).data('lang-code');
+                $('#setlang-form').find('input[name="language"]').val(lang).end().submit();
+            });
+
+            var teams = new Bloodhound({
+                datumTokenizer: Bloodhound.tokenizers.obj.whitespace('title'),
+                queryTokenizer: Bloodhound.tokenizers.whitespace,
+                remote: {
+                    url: '/search/team/autocomplete/?q=%QUERY',
+                    wildcard: '%QUERY'
+                }
+            });
+
+            var players = new Bloodhound({
+                datumTokenizer: Bloodhound.tokenizers.obj.whitespace('title'),
+                queryTokenizer: Bloodhound.tokenizers.whitespace,
+                remote: {
+                    url: '/search/player/autocomplete/?q=%QUERY',
+                    wildcard: '%QUERY'
+                }
+            });
+
+            $('.typeahead').typeahead({
+                    minLength: 2,
+                    highlight: false
+                },{
+                    display: 'title',
+                    limit: Infinity,
+                    source: teams,
+                    templates: {
+                        empty: '<div class="not-found">Teams not found</div>',
+                        header: '<div class="header">Teams</div>',
+                        
+                        suggestion: Handlebars.compile(
+                            '<div class="result-row">' +
+                                '<div class="thumb"><img src="{{logo}}" /></div>' +
+                                '<div class="body"><strong class="title">{{title}}</strong><br /><small>{{region}}</small></div>' +
+                            '</div>')
+                        
+                    }
+                },{
+                    display: 'title',
+                    limit: Infinity,
+                    source: players,
+                    templates: {
+                        empty: '<div class="not-found">Players not found</div>',
+                        header: '<div class="header">Players</div>',
+                        
+                        suggestion: Handlebars.compile(
+                            '<div class="result-row">' +
+                                '<div class="thumb"><img src="{{logo}}" /></div>' +
+                                '<div class="body"><strong class="title">{{title}}</strong><br /><small>{{team}}</small></div>' +
+                            '</div>')
+                        
+                    }
+                }
+            ).bind('typeahead:select', function(e, suggestion) {
+                window.location.href = suggestion.url;
+            });
+        });
+        //]]>
+    </script>
+
+    
+    
+    <link rel="stylesheet" href="http://c.masterleague.net/static/css/loader.css">
+    <script type="text/javascript">
+        //<![CDATA[
+        $(document).ready(function () {
+            $('.nav-tabs').on('shown.bs.tab', function(e) {
+                var target = $(e.target).attr("href");
+
+                if ((target == '#statistics') && $('#statistics').find('.loader').length > 0)
+                    $.get(
+                        '/match/1727/stats/',
+                        function(data) {
+                            $('#statistics').html(data);
+                            $('[data-toggle="popover"]').popover({
+                                container: 'body',
+                                placement: 'auto bottom',
+                                trigger: 'hover'
+                            });
+
+                            $('.toggle-stats').on('click', function(e) {
+                                e.preventDefault();
+                                $(this).blur();
+                                $('table.match-stats').toggle();
+                            });
+
+                            $("html, body").scrollTop($(document).height());
+                            Sortable.init()
+                        }
+                    );
+            });
+        });
+        //]]>
+    </script>
+
+
+    <script type="text/javascript">
+        //<![CDATA[
+        function setup_spoilers(is_on) {
+            $('#spoilers-switcher').prop('checked', is_on).bootstrapSwitch('state', is_on, true);
+
+            if (is_on) {
+                $('.spoilers-on').show();
+                $('.spoilers-off').hide();
+                $('tr.match-line').show();
+            } else {
+                $('.spoilers-on').hide();
+                $('.spoilers-off').show();
+                $('tr.match-line[data-game-n!="1"]').hide();
+
+                $('tr.match-caption').each(function() {
+                    if ($(this).nextAll('tr:visible:first').hasClass('match-caption'))
+                        $(this).next('tr.match-line').show();
+                });
+            }
+        }
+
+        function init_spoilers() {
+            if (Cookies.get('spoilers'))
+                setup_spoilers(Cookies.get('spoilers') == 'True');
+            else
+                setup_spoilers(false);
+        }
+
+        $(document).ready(function () {
+            $('#spoilers-switcher').bootstrapSwitch({
+                size: 'mini'
+            }).on('switchChange.bootstrapSwitch', function () {
+                $.post('/spoilers/', {'on': $(this).prop('checked')});
+                setup_spoilers($(this).prop('checked'));
+            });
+
+            init_spoilers();
+
+            $(document).on('click', '.show-score', function (e) {
+                e.preventDefault();
+                e.stopPropagation();
+
+                var score_wrapper = $(this).parents('.score');
+                var match_line = $(this).parents('tr.match-line');
+
+                score_wrapper.find('.spoilers-on').show();
+                score_wrapper.find('.spoilers-off').hide();
+
+                var game_n = parseInt(match_line.data('gameN')) + 1;
+                var prev_game = match_line.prev('[data-game-n="' + game_n + '"]');
+                var next_game = match_line.next('[data-game-n="' + game_n + '"]');
+
+                prev_game.show();
+                next_game.show();
+
+                if (!prev_game.length && !next_game.length) {
+                    var match_caption = $(this).parents('tr').prevAll('tr.match-caption:first');
+
+                    match_caption.find('.spoilers-off').hide();
+                    match_caption.find('.spoilers-on').show();
+                }
+            });
+
+            $(document).on('click', 'tr[data-href]', function () {
+                window.document.location = $(this).data('href');
+            }).on('click', 'tr[data-href] a', function (e) {
+                e.preventDefault();
+            });
+        });
+        //]]>
+    </script>
+</head>
+<body>
+    <div class="container">
+        <nav class="navbar navbar-inverse">
+            <div class="container-fluid">
+                <div class="navbar-header">
+                    <button type="button" class="navbar-toggle collapsed" data-toggle="collapse"
+                            data-target="#navbar-menu" aria-expanded="false">
+                        <span class="sr-only">Toggle navigation</span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
+                    <a class="navbar-brand" href="/">
+                        <img alt="Brand" src="http://c.masterleague.net/static/brand.png">
+                    </a>
+                </div>
+
+                <div class="collapse navbar-collapse" id="navbar-menu">
+                    <ul class="nav navbar-nav">
+                        <li><a href="/teams/">Teams</a></li>
+                        <li><a href="/players/">Players</a></li>
+                        <li><a href="/tournaments/">Tournaments</a></li>
+                        <li class="active"><a href="/matches/">Matches</a></li>
+                        <li class="hidden-sm"><a href="/maps/">Maps</a></li>
+                        <li class="hidden-sm"><a href="/heroes/">Heroes</a></li>
+                        <li><a href="/meta/">Meta</a></li>
+                    </ul>
+
+                    <form action="/search/" class="navbar-form navbar-right" role="search">
+                        <div class="form-group">
+                            <div class="input-group">
+                                <input type="text" name="q" class="form-control typeahead" placeholder="Search" />
+                                <span class="input-group-addon"><span class="glyphicon glyphicon-search"></span></span>
+                            </div>
+                        </div>
+                        <input type="submit" style="display: none;" />
+                    </form>
+                </div>
+            </div>
+        </nav>
+
+        
+    
+    
+    
+    
+
+    <ol class="breadcrumb">
+        <li><a href="/">Home</a></li>
+        
+            <li><a href="/tournament/30/">Fall Global Championship</a></li>
+            <li><a href="/tournament/stage/134/">Playoffs</a></li>
+            <li>Final</li>
+            <li>Game 1</li>
+        
+        <li class="date">Nov. 5, 2016</li>
+    </ol>
+
+    <div id="draft">
+        <div class="row">
+            <div class="col-xs-6">
+                <div class="media team-left">
+                    <div class="media-body">
+                        <h2>
+                            <a href="/team/ballistix/">Ballistix</a>
+                        </h2>
+                        
+                            <span class="label label-primary spoilers-on">WINNER</span>
+                        
+                    </div>
+                    <div class="media-right">
+                        <a href="/team/ballistix/">
+                            <img class="media-object" src="http://c.masterleague.net/media/team/logo/1476295646.png.100x50_q85.png" alt="Ballistix" />
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-xs-6">
+                <div class="media team-right">
+                    <div class="media-left">
+                        <a href="/team/fnatic/">
+                            <img class="media-object" src="http://c.masterleague.net/media/587px-Fnaticlogo.png.100x50_q85.png" alt="Fnatic" />
+                        </a>
+                    </div>
+                    <div class="media-body">
+                        <h2>
+                            <a href="/team/fnatic/">Fnatic</a>
+                        </h2>
+                        
+                            <span class="label label-danger spoilers-on">LOSER</span>
+                        
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row" style="margin-top: 5px">
+            <div class="col-xs-12">
+                <span class="first-pick">FIRST PICK</span>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-xs-6" style="overflow: hidden">
+                
+                    <div class="hero-left">
+                        <a href="/hero/muradin/tournament/30/">
+                            <img src="http://c.masterleague.net/media/hero/portrait/1458338153.jpg.90x135_q85_crop.jpg" class="img-rounded" alt="Muradin" title="Muradin" />
+                        </a>
+                        <a href="/player/197/" class="player" title="Noblesse">Noblesse</a>
+                    </div>
+                
+                    <div class="hero-left">
+                        <a href="/hero/tychus/tournament/30/">
+                            <img src="http://c.masterleague.net/media/hero/portrait/1458394617.jpg.90x135_q85_crop.jpg" class="img-rounded" alt="Tychus" title="Tychus" />
+                        </a>
+                        <a href="/player/198/" class="player" title="sCsC">sCsC</a>
+                    </div>
+                
+                    <div class="hero-left">
+                        <a href="/hero/rehgar/tournament/30/">
+                            <img src="http://c.masterleague.net/media/hero/portrait/1458338466.jpg.90x135_q85_crop.jpg" class="img-rounded" alt="Rehgar" title="Rehgar" />
+                        </a>
+                        <a href="/player/219/" class="player" title="Swoy">Swoy</a>
+                    </div>
+                
+                    <div class="hero-left">
+                        <a href="/hero/tyrael/tournament/30/">
+                            <img src="http://c.masterleague.net/media/hero/portrait/1458393128.jpg.90x135_q85_crop.jpg" class="img-rounded" alt="Tyrael" title="Tyrael" />
+                        </a>
+                        <a href="/player/453/" class="player" title="Jeongha">Jeongha</a>
+                    </div>
+                
+                    <div class="hero-left">
+                        <a href="/hero/sylvanas/tournament/30/">
+                            <img src="http://c.masterleague.net/media/hero/portrait/1458394926.jpg.90x135_q85_crop.jpg" class="img-rounded" alt="Sylvanas" title="Sylvanas" />
+                        </a>
+                        <a href="/player/222/" class="player" title="NaCHoJin">NaCHoJin</a>
+                    </div>
+                
+            </div>
+
+            <div class="col-sm-6" style="overflow: hidden">
+                
+                    <div class="hero-right">
+                        <a href="/hero/malfurion/tournament/30/">
+                            <img src="http://c.masterleague.net/media/hero/portrait/1458393243.jpg.90x135_q85_crop.jpg" class="img-rounded" alt="Malfurion" title="Malfurion" />
+                        </a>
+                        <a href="/player/107/" class="player" title="SmX">SmX</a>
+                    </div>
+                
+                    <div class="hero-right">
+                        <a href="/hero/valla/tournament/30/">
+                            <img src="http://c.masterleague.net/media/hero/portrait/1458393185.jpg.90x135_q85_crop.jpg" class="img-rounded" alt="Valla" title="Valla" />
+                        </a>
+                        <a href="/player/108/" class="player" title="QuackNiix">QuackNiix</a>
+                    </div>
+                
+                    <div class="hero-right">
+                        <a href="/hero/xul/tournament/30/">
+                            <img src="http://c.masterleague.net/media/hero/portrait/1458337662.jpg.90x135_q85_crop.jpg" class="img-rounded" alt="Xul" title="Xul" />
+                        </a>
+                        <a href="/player/110/" class="player" title="scHwimpi">scHwimpi</a>
+                    </div>
+                
+                    <div class="hero-right">
+                        <a href="/hero/leoric/tournament/30/">
+                            <img src="http://c.masterleague.net/media/hero/portrait/1458339096.jpg.90x135_q85_crop.jpg" class="img-rounded" alt="Leoric" title="Leoric" />
+                        </a>
+                        <a href="/player/105/" class="player" title="Wubby">Wubby</a>
+                    </div>
+                
+                    <div class="hero-right">
+                        <a href="/hero/zarya/tournament/30/">
+                            <img src="http://c.masterleague.net/media/hero/portrait/1475056735.jpg.90x135_q85_crop.jpg" class="img-rounded" alt="Zarya" title="Zarya" />
+                        </a>
+                        <a href="/player/106/" class="player" title="Breez">Breez</a>
+                    </div>
+                
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-xs-12">
+                <span class="bans-title">BANS</span>
+            </div>
+        </div>
+
+        <div class="row" style="margin: 0">
+            <div class="col-xs-4 bans-left">
+                
+                    <div class="hero-left">
+                        <a href="/hero/etc/tournament/30/">
+                            <img src="http://c.masterleague.net/media/hero/portrait/1458338982.jpg.90x135_q85_crop.jpg" class="img-rounded" alt="E.T.C." title="E.T.C." />
+                        </a>
+                    </div>
+                
+                    <div class="hero-left">
+                        <a href="/hero/johanna/tournament/30/">
+                            <img src="http://c.masterleague.net/media/hero/portrait/1458338404.jpg.90x135_q85_crop.jpg" class="img-rounded" alt="Johanna" title="Johanna" />
+                        </a>
+                    </div>
+                
+            </div>
+
+            <div class="col-xs-4 map">
+                <a href="/map/tomb-of-the-spider-queen/tournament/30/">
+                    <img src="http://c.masterleague.net/media/map/1458390926.jpg.270x80_q85_crop.jpg" class="img-rounded" alt="Tomb of the Spider Queen" title="Tomb of the Spider Queen" />
+                </a>
+                <span class="name">TOMB OF THE SPIDER QUEEN</span>
+            </div>
+
+            <div class="col-xs-4 bans-right">
+                
+                    <div class="hero-right">
+                        <a href="/hero/tassadar/tournament/30/">
+                            <img src="http://c.masterleague.net/media/hero/portrait/1458384523.jpg.90x135_q85_crop.jpg" class="img-rounded" alt="Tassadar" title="Tassadar" />
+                        </a>
+                    </div>
+                
+                    <div class="hero-right">
+                        <a href="/hero/alarak/tournament/30/">
+                            <img src="http://c.masterleague.net/media/hero/portrait/1473854327.jpg.90x135_q85_crop.jpg" class="img-rounded" alt="Alarak" title="Alarak" />
+                        </a>
+                    </div>
+                
+            </div>
+        </div>
+    </div>
+
+    <ul class="nav nav-tabs" style="margin: 25px 0">
+        <li class="active">
+            <a href="#related" data-toggle="tab">Previous Matches</a>
+        </li>
+
+        
+            <li class="dropdown">
+                <a aria-expanded="false" aria-haspopup="true" role="button" href="#" data-toggle="dropdown"
+                   class="dropdown-toggle">Watch<span class="caret"></span> </a>
+                <ul class="dropdown-menu">
+                    
+                        <li>
+                            <a href="#video-1,451" data-toggle="tab">
+                                <img src="http://c.masterleague.net/static/flags/ru.gif" alt="Russia" />
+                                HappyZerG
+                            </a>
+                        </li>
+                    
+                        <li>
+                            <a href="#video-1,397" data-toggle="tab">
+                                <img src="http://c.masterleague.net/static/flags/kr.gif" alt="South Korea" />
+                                INVEN
+                            </a>
+                        </li>
+                    
+                        <li>
+                            <a href="#video-1,429" data-toggle="tab">
+                                <img src="http://c.masterleague.net/static/flags/fr.gif" alt="France" />
+                                GameWard TV
+                            </a>
+                        </li>
+                    
+                </ul>
+            </li>
+        
+
+        
+
+        
+
+        <li>
+            <a href="#comments" data-toggle="tab">Comments <span class="disqus-comment-count badge" data-disqus-identifier="match-1727"></span></a>
+        </li>
+    </ul>
+
+    <div class="tab-content">
+        <div id="related" class="tab-pane active">
+            
+<table class="table table-hover table-condensed table-fixed" style="margin-top: 15px; position: relative">
+    <col width="12%">
+    <col class="hidden-sm hidden-xs" width="24%">
+    <col>
+    <col class="hidden-md hidden-sm hidden-xs" width="8%">
+    
+    <thead>
+    <tr>
+        
+            <th>Date</th>
+            <th class="hidden-sm hidden-xs">Tournament / Map</th>
+        
+        <th>
+            Drafts
+            <div class="spoiler-switcher-wrapper">
+                Spoilers&nbsp;&nbsp;<input id="spoilers-switcher" type="checkbox" />
+            </div>
+        </th>
+        <th class="hidden-md hidden-sm hidden-xs"></th>
+    </tr>
+    </thead>
+    
+    <tbody>
+    
+    
+        
+            
+                <tr class="match-caption">
+                    <td></td>
+                    <td class="nowrap hidden-sm hidden-xs">
+                        <a href="/tournament/30/" title="Fall Global Championship">Fall Global Championship</a>
+                    </td>
+                    <td>
+                        <a href="/tournament/stage/134/" title="Fall Global Championship - Playoffs" class="hidden-sm hidden-xs">Fall Global Championship - Playoffs</a>
+                        <a href="/tournament/stage/134/" title="Fall Global Championship - Playoffs" class="visible-xs visible-sm">Fall Global Championship - Playoffs</a>
+                    </td>
+                    <td class="hidden-md hidden-sm hidden-xs"></td>
+                </tr>
+            
+        
+        
+            <tr class="match-caption">
+                <td class="nowrap">
+                    <span class="visible-xs visible-sm">Final</span>
+                    <span class="hidden-sm hidden-xs">11/05/2016</span>
+                </td>
+                <td class="hidden-sm hidden-xs">
+                    Final
+                </td>
+                <td class="nowrap">
+                    <span class="_team-name first-team"><a href="/team/fnatic/" class="">
+                                        
+                                        Fnatic
+                                        <img src="http://c.masterleague.net/media/587px-Fnaticlogo.png.20x20_q85.png" alt="Fnatic" /></a></span><span class="spoilers-on" style="display: none"><span class="vs">1:3</span></span><span class="spoilers-off"><span class="vs">
+                                            
+                                                vs
+                                            
+                                        </span></span><span class="_team-name"><a href="/team/ballistix/" class=""><img src="http://c.masterleague.net/media/team/logo/1476295646.png.20x20_q85.png" alt="Ballistix" />
+                                        Ballistix
+                                        
+                                    </a></span>
+                </td>
+                <td class="hidden-md hidden-sm hidden-xs"></td>
+            </tr>
+        
+
+        <tr class="match-line" data-href="/match/1730/" data-game-n="4" style="display: none">
+            <td class="nowrap game">
+                <a href="/match/1730/">Game 4</a>
+            </td>
+            <td class="nowrap map hidden-sm hidden-xs">Towers of Doom</td>
+            <td class="nowrap">
+                <img src="http://c.masterleague.net/media/hero/portrait/1458339259.jpg.50x25_q85_crop-0%2C-140.jpg" alt="Falstad" title="Falstad"  /><img src="http://c.masterleague.net/media/hero/portrait/1458338982.jpg.50x25_q85_crop-0%2C-140.jpg" alt="E.T.C." title="E.T.C."  /><img src="http://c.masterleague.net/media/hero/portrait/1458393243.jpg.50x25_q85_crop-0%2C-140.jpg" alt="Malfurion" title="Malfurion"  /><img src="http://c.masterleague.net/media/hero/portrait/1458392766.jpg.50x25_q85_crop-0%2C-140.jpg" alt="Stitches" title="Stitches"  /><img src="http://c.masterleague.net/media/hero/portrait/1458396330.jpg.50x25_q85_crop-0%2C-140.jpg" alt="Sgt. Hammer" title="Sgt. Hammer"  /><div class="score"><span class="spoilers-on" style="display: none"><span class="label label-danger" title="Lose">L</span>:<span class="label label-primary" title="Win">W</span></span><span class="spoilers-off"><button type="button" class="btn btn-xs btn-default show-score">Show</button></span></div><img src="http://c.masterleague.net/media/hero/portrait/1461915512.jpg.50x25_q85_crop-0%2C-140.jpg" alt="Tracer" title="Tracer"  /><img src="http://c.masterleague.net/media/hero/portrait/1458384523.jpg.50x25_q85_crop-0%2C-140.jpg" alt="Tassadar" title="Tassadar"  /><img src="http://c.masterleague.net/media/hero/portrait/1458337959.jpg.50x25_q85_crop-0%2C-140.jpg" alt="Li-Ming" title="Li-Ming"  /><img src="http://c.masterleague.net/media/hero/portrait/1458392692.jpg.50x25_q85_crop-0%2C-140.jpg" alt="Brightwing" title="Brightwing"  /><img src="http://c.masterleague.net/media/hero/portrait/1458338153.jpg.50x25_q85_crop-0%2C-140.jpg" alt="Muradin" title="Muradin"  />
+            </td>
+            <td class="hidden-md hidden-sm hidden-xs more">
+                <span class="item">
+                
+                    <span class="glyphicon glyphicon-film" aria-hidden="true" title="VOD"></span>
+                
+                </span>
+                <span class="item">
+                
+                </span>
+            </td>
+        </tr>
+    
+        
+            
+        
+        
+
+        <tr class="match-line" data-href="/match/1729/" data-game-n="3" style="display: none">
+            <td class="nowrap game">
+                <a href="/match/1729/">Game 3</a>
+            </td>
+            <td class="nowrap map hidden-sm hidden-xs">Warhead Junction</td>
+            <td class="nowrap">
+                <img src="http://c.masterleague.net/media/hero/portrait/1458339259.jpg.50x25_q85_crop-0%2C-140.jpg" alt="Falstad" title="Falstad"  /><img src="http://c.masterleague.net/media/hero/portrait/1458392692.jpg.50x25_q85_crop-0%2C-140.jpg" alt="Brightwing" title="Brightwing"  /><img src="http://c.masterleague.net/media/hero/portrait/1458393128.jpg.50x25_q85_crop-0%2C-140.jpg" alt="Tyrael" title="Tyrael"  /><img src="http://c.masterleague.net/media/hero/portrait/1458384523.jpg.50x25_q85_crop-0%2C-140.jpg" alt="Tassadar" title="Tassadar"  /><img src="http://c.masterleague.net/media/hero/portrait/1461915512.jpg.50x25_q85_crop-0%2C-140.jpg" alt="Tracer" title="Tracer"  /><div class="score"><span class="spoilers-on" style="display: none"><span class="label label-primary" title="Win">W</span>:<span class="label label-danger" title="Lose">L</span></span><span class="spoilers-off"><button type="button" class="btn btn-xs btn-default show-score">Show</button></span></div><img src="http://c.masterleague.net/media/hero/portrait/1458393629.jpg.50x25_q85_crop-0%2C-140.jpg" alt="Chen" title="Chen"  /><img src="http://c.masterleague.net/media/hero/portrait/1458338466.jpg.50x25_q85_crop-0%2C-140.jpg" alt="Rehgar" title="Rehgar"  /><img src="http://c.masterleague.net/media/hero/portrait/1458337959.jpg.50x25_q85_crop-0%2C-140.jpg" alt="Li-Ming" title="Li-Ming"  /><img src="http://c.masterleague.net/media/hero/portrait/1458339440.jpg.50x25_q85_crop-0%2C-140.jpg" alt="Zeratul" title="Zeratul"  /><img src="http://c.masterleague.net/media/hero/portrait/1458338982.jpg.50x25_q85_crop-0%2C-140.jpg" alt="E.T.C." title="E.T.C."  />
+            </td>
+            <td class="hidden-md hidden-sm hidden-xs more">
+                <span class="item">
+                
+                    <span class="glyphicon glyphicon-film" aria-hidden="true" title="VOD"></span>
+                
+                </span>
+                <span class="item">
+                
+                </span>
+            </td>
+        </tr>
+    
+        
+            
+        
+        
+
+        <tr class="match-line" data-href="/match/1728/" data-game-n="2" style="display: none">
+            <td class="nowrap game">
+                <a href="/match/1728/">Game 2</a>
+            </td>
+            <td class="nowrap map hidden-sm hidden-xs">Sky Temple</td>
+            <td class="nowrap">
+                <img src="http://c.masterleague.net/media/hero/portrait/1458338153.jpg.50x25_q85_crop-0%2C-140.jpg" alt="Muradin" title="Muradin"  /><img src="http://c.masterleague.net/media/hero/portrait/1458394617.jpg.50x25_q85_crop-0%2C-140.jpg" alt="Tychus" title="Tychus"  /><img src="http://c.masterleague.net/media/hero/portrait/1458393128.jpg.50x25_q85_crop-0%2C-140.jpg" alt="Tyrael" title="Tyrael"  /><img src="http://c.masterleague.net/media/hero/portrait/1458338879.jpg.50x25_q85_crop-0%2C-140.jpg" alt="Greymane" title="Greymane"  /><img src="http://c.masterleague.net/media/hero/portrait/1458338466.jpg.50x25_q85_crop-0%2C-140.jpg" alt="Rehgar" title="Rehgar"  /><div class="score"><span class="spoilers-on" style="display: none"><span class="label label-danger" title="Lose">L</span>:<span class="label label-primary" title="Win">W</span></span><span class="spoilers-off"><button type="button" class="btn btn-xs btn-default show-score">Show</button></span></div><img src="http://c.masterleague.net/media/hero/portrait/1458339440.jpg.50x25_q85_crop-0%2C-140.jpg" alt="Zeratul" title="Zeratul"  /><img src="http://c.masterleague.net/media/hero/portrait/1458393243.jpg.50x25_q85_crop-0%2C-140.jpg" alt="Malfurion" title="Malfurion"  /><img src="http://c.masterleague.net/media/hero/portrait/1458337959.jpg.50x25_q85_crop-0%2C-140.jpg" alt="Li-Ming" title="Li-Ming"  /><img src="http://c.masterleague.net/media/hero/portrait/1458339259.jpg.50x25_q85_crop-0%2C-140.jpg" alt="Falstad" title="Falstad"  /><img src="http://c.masterleague.net/media/hero/portrait/1458338404.jpg.50x25_q85_crop-0%2C-140.jpg" alt="Johanna" title="Johanna"  />
+            </td>
+            <td class="hidden-md hidden-sm hidden-xs more">
+                <span class="item">
+                
+                    <span class="glyphicon glyphicon-film" aria-hidden="true" title="VOD"></span>
+                
+                </span>
+                <span class="item">
+                
+                </span>
+            </td>
+        </tr>
+    
+        
+            
+        
+        
+
+        <tr class="match-line info" data-href="/match/1727/" data-game-n="1">
+            <td class="nowrap game">
+                <a href="/match/1727/">Game 1</a>
+            </td>
+            <td class="nowrap map hidden-sm hidden-xs">Tomb of the Spider Queen</td>
+            <td class="nowrap">
+                <img src="http://c.masterleague.net/media/hero/portrait/1458393243.jpg.50x25_q85_crop-0%2C-140.jpg" alt="Malfurion" title="Malfurion"  /><img src="http://c.masterleague.net/media/hero/portrait/1458393185.jpg.50x25_q85_crop-0%2C-140.jpg" alt="Valla" title="Valla"  /><img src="http://c.masterleague.net/media/hero/portrait/1458337662.jpg.50x25_q85_crop-0%2C-140.jpg" alt="Xul" title="Xul"  /><img src="http://c.masterleague.net/media/hero/portrait/1458339096.jpg.50x25_q85_crop-0%2C-140.jpg" alt="Leoric" title="Leoric"  /><img src="http://c.masterleague.net/media/hero/portrait/1475056735.jpg.50x25_q85_crop-0%2C-140.jpg" alt="Zarya" title="Zarya"  /><div class="score"><span class="spoilers-on" style="display: none"><span class="label label-danger" title="Lose">L</span>:<span class="label label-primary" title="Win">W</span></span><span class="spoilers-off"><button type="button" class="btn btn-xs btn-default show-score">Show</button></span></div><img src="http://c.masterleague.net/media/hero/portrait/1458394926.jpg.50x25_q85_crop-0%2C-140.jpg" alt="Sylvanas" title="Sylvanas"  /><img src="http://c.masterleague.net/media/hero/portrait/1458393128.jpg.50x25_q85_crop-0%2C-140.jpg" alt="Tyrael" title="Tyrael"  /><img src="http://c.masterleague.net/media/hero/portrait/1458338466.jpg.50x25_q85_crop-0%2C-140.jpg" alt="Rehgar" title="Rehgar"  /><img src="http://c.masterleague.net/media/hero/portrait/1458394617.jpg.50x25_q85_crop-0%2C-140.jpg" alt="Tychus" title="Tychus"  /><img src="http://c.masterleague.net/media/hero/portrait/1458338153.jpg.50x25_q85_crop-0%2C-140.jpg" alt="Muradin" title="Muradin"  />
+            </td>
+            <td class="hidden-md hidden-sm hidden-xs more">
+                <span class="item">
+                
+                    <span class="glyphicon glyphicon-film" aria-hidden="true" title="VOD"></span>
+                
+                </span>
+                <span class="item">
+                
+                </span>
+            </td>
+        </tr>
+    
+        
+            
+                <tr class="match-caption">
+                    <td></td>
+                    <td class="nowrap hidden-sm hidden-xs">
+                        <a href="/tournament/30/" title="Fall Global Championship">Fall Global Championship</a>
+                    </td>
+                    <td>
+                        <a href="/tournament/stage/133/" title="Fall Global Championship - Group Stage #2 - Group B" class="hidden-sm hidden-xs">Fall Global Championship - Group Stage #2 - Group B</a>
+                        <a href="/tournament/stage/133/" title="Fall Global Championship - Group Stage #2 - Group B" class="visible-xs visible-sm">Fall Global Championship - Group Stage #2 - Group B</a>
+                    </td>
+                    <td class="hidden-md hidden-sm hidden-xs"></td>
+                </tr>
+            
+        
+        
+            <tr class="match-caption">
+                <td class="nowrap">
+                    <span class="visible-xs visible-sm">Winners Final</span>
+                    <span class="hidden-sm hidden-xs">10/28/2016</span>
+                </td>
+                <td class="hidden-sm hidden-xs">
+                    Winners Final
+                </td>
+                <td class="nowrap">
+                    <span class="_team-name first-team"><a href="/team/fnatic/" class="">
+                                        
+                                        Fnatic
+                                        <img src="http://c.masterleague.net/media/587px-Fnaticlogo.png.20x20_q85.png" alt="Fnatic" /></a></span><span class="spoilers-on" style="display: none"><span class="vs">0:2</span></span><span class="spoilers-off"><span class="vs">
+                                            
+                                                vs
+                                            
+                                        </span></span><span class="_team-name"><a href="/team/ballistix/" class=""><img src="http://c.masterleague.net/media/team/logo/1476295646.png.20x20_q85.png" alt="Ballistix" />
+                                        Ballistix
+                                        
+                                    </a></span>
+                </td>
+                <td class="hidden-md hidden-sm hidden-xs"></td>
+            </tr>
+        
+
+        <tr class="match-line" data-href="/match/1708/" data-game-n="2" style="display: none">
+            <td class="nowrap game">
+                <a href="/match/1708/">Game 2</a>
+            </td>
+            <td class="nowrap map hidden-sm hidden-xs">Towers of Doom</td>
+            <td class="nowrap">
+                <img src="http://c.masterleague.net/media/hero/portrait/1458339259.jpg.50x25_q85_crop-0%2C-140.jpg" alt="Falstad" title="Falstad"  /><img src="http://c.masterleague.net/media/hero/portrait/1458393243.jpg.50x25_q85_crop-0%2C-140.jpg" alt="Malfurion" title="Malfurion"  /><img src="http://c.masterleague.net/media/hero/portrait/1458338404.jpg.50x25_q85_crop-0%2C-140.jpg" alt="Johanna" title="Johanna"  /><img src="http://c.masterleague.net/media/hero/portrait/1458339440.jpg.50x25_q85_crop-0%2C-140.jpg" alt="Zeratul" title="Zeratul"  /><img src="http://c.masterleague.net/media/hero/portrait/1458337959.jpg.50x25_q85_crop-0%2C-140.jpg" alt="Li-Ming" title="Li-Ming"  /><div class="score"><span class="spoilers-on" style="display: none"><span class="label label-danger" title="Lose">L</span>:<span class="label label-primary" title="Win">W</span></span><span class="spoilers-off"><button type="button" class="btn btn-xs btn-default show-score">Show</button></span></div><img src="http://c.masterleague.net/media/hero/portrait/1458338466.jpg.50x25_q85_crop-0%2C-140.jpg" alt="Rehgar" title="Rehgar"  /><img src="http://c.masterleague.net/media/hero/portrait/1458339378.jpg.50x25_q85_crop-0%2C-140.jpg" alt="Thrall" title="Thrall"  /><img src="http://c.masterleague.net/media/hero/portrait/1458394617.jpg.50x25_q85_crop-0%2C-140.jpg" alt="Tychus" title="Tychus"  /><img src="http://c.masterleague.net/media/hero/portrait/1458393521.jpg.50x25_q85_crop-0%2C-140.jpg" alt="Abathur" title="Abathur"  /><img src="http://c.masterleague.net/media/hero/portrait/1458338153.jpg.50x25_q85_crop-0%2C-140.jpg" alt="Muradin" title="Muradin"  />
+            </td>
+            <td class="hidden-md hidden-sm hidden-xs more">
+                <span class="item">
+                
+                    <span class="glyphicon glyphicon-film" aria-hidden="true" title="VOD"></span>
+                
+                </span>
+                <span class="item">
+                
+                    <span class="glyphicon glyphicon-download-alt" aria-hidden="true" title="Replay"></span>
+                
+                </span>
+            </td>
+        </tr>
+    
+        
+            
+        
+        
+
+        <tr class="match-line" data-href="/match/1707/" data-game-n="1">
+            <td class="nowrap game">
+                <a href="/match/1707/">Game 1</a>
+            </td>
+            <td class="nowrap map hidden-sm hidden-xs">Infernal Shrines</td>
+            <td class="nowrap">
+                <img src="http://c.masterleague.net/media/hero/portrait/1458338982.jpg.50x25_q85_crop-0%2C-140.jpg" alt="E.T.C." title="E.T.C."  /><img src="http://c.masterleague.net/media/hero/portrait/1458394617.jpg.50x25_q85_crop-0%2C-140.jpg" alt="Tychus" title="Tychus"  /><img src="http://c.masterleague.net/media/hero/portrait/1458393243.jpg.50x25_q85_crop-0%2C-140.jpg" alt="Malfurion" title="Malfurion"  /><img src="http://c.masterleague.net/media/hero/portrait/1458396453.jpg.50x25_q85_crop-0%2C-140.jpg" alt="Kael&#39;thas" title="Kael&#39;thas"  /><img src="http://c.masterleague.net/media/hero/portrait/1458337662.jpg.50x25_q85_crop-0%2C-140.jpg" alt="Xul" title="Xul"  /><div class="score"><span class="spoilers-on" style="display: none"><span class="label label-danger" title="Lose">L</span>:<span class="label label-primary" title="Win">W</span></span><span class="spoilers-off"><button type="button" class="btn btn-xs btn-default show-score">Show</button></span></div><img src="http://c.masterleague.net/media/hero/portrait/1458338879.jpg.50x25_q85_crop-0%2C-140.jpg" alt="Greymane" title="Greymane"  /><img src="http://c.masterleague.net/media/hero/portrait/1470990978.jpg.50x25_q85_crop-0%2C-140.jpg" alt="Auriel" title="Auriel"  /><img src="http://c.masterleague.net/media/hero/portrait/1458338404.jpg.50x25_q85_crop-0%2C-140.jpg" alt="Johanna" title="Johanna"  /><img src="http://c.masterleague.net/media/hero/portrait/1458393185.jpg.50x25_q85_crop-0%2C-140.jpg" alt="Valla" title="Valla"  /><img src="http://c.masterleague.net/media/hero/portrait/1458384523.jpg.50x25_q85_crop-0%2C-140.jpg" alt="Tassadar" title="Tassadar"  />
+            </td>
+            <td class="hidden-md hidden-sm hidden-xs more">
+                <span class="item">
+                
+                    <span class="glyphicon glyphicon-film" aria-hidden="true" title="VOD"></span>
+                
+                </span>
+                <span class="item">
+                
+                    <span class="glyphicon glyphicon-download-alt" aria-hidden="true" title="Replay"></span>
+                
+                </span>
+            </td>
+        </tr>
+    
+    
+    </tbody>
+</table>
+
+        </div>
+
+        
+            <div id="video-1,451" class="tab-pane">
+                <div class="embed-responsive embed-responsive-16by9">
+                    <iframe class="embed-responsive-item" src="https://www.youtube.com/embed/PtBt7X64jh8?start=707" allowfullscreen></iframe>
+                </div>
+            </div>
+        
+            <div id="video-1,397" class="tab-pane">
+                <div class="embed-responsive embed-responsive-16by9">
+                    <iframe class="embed-responsive-item" src="https://www.youtube.com/embed/G8x3SPBFAgU?start=1070" allowfullscreen></iframe>
+                </div>
+            </div>
+        
+            <div id="video-1,429" class="tab-pane">
+                <div class="embed-responsive embed-responsive-16by9">
+                    <iframe class="embed-responsive-item" src="https://www.youtube.com/embed/WpAKUpNZ5n0?start=1361" allowfullscreen></iframe>
+                </div>
+            </div>
+        
+
+        
+
+        <div id="comments" class="tab-pane">
+            <div id="disqus_thread"></div>
+            <script id="dsq-count-scr" src="//masterleague.disqus.com/count.js" async></script>
+            <script>
+                var disqus_config = function () {
+                    this.page.url = 'http://masterleague.net/match/1727/';
+                    this.page.identifier = 'match-1727';
+                };
+                (function() {  // DON'T EDIT BELOW THIS LINE
+                    var d = document, s = d.createElement('script');
+                    s.src = '//masterleague.disqus.com/embed.js';
+                    s.setAttribute('data-timestamp', +new Date());
+                    (d.head || d.body).appendChild(s);
+                })();
+            </script>
+            <noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript" rel="nofollow">comments powered by Disqus.</a></noscript>
+        </div>
+    </div>
+
+    <script src="http://c.masterleague.net/static/sortable/js/sortable.min.js"></script>
+    <link rel="stylesheet" href="http://c.masterleague.net/static/sortable/css/sortable-theme-bootstrap.css">
+
+
+        <hr />
+
+        <div class="row footer">
+            <div class="col-sm-5">
+                &copy; 2016 MasterLeague.net - HotS eSports statistics.
+            </div>
+
+            <div class="col-sm-2 text-center">
+                <a href="https://twitter.com/MasterLeagueNet" target="_blank">
+                    <img src="http://c.masterleague.net/static/twitter.png" alt="" />
+                </a>
+            </div>
+
+            <div class="col-sm-5 text-right">
+            <a href="/changelogs/">Changelog</a> &nbsp;&bull;&nbsp;
+                <a href="/feedback/">Feedback</a> &nbsp;&bull;&nbsp;
+                <a href="/credits/">Credits</a> &nbsp;&bull;&nbsp;
+                <a href="/faq/">FAQ</a>
+            </div>
+        </div>
+
+        <div class="row footer">
+            <div class="col-sm-6">
+                <form id="setlang-form" action="/i18n/setlang/" method="post" style="display: none">
+                    <input type="text" name="language" />
+                </form>
+                
+                    <a href="#" class="setlang" title="English" data-lang-code="en" style="margin-right: 2px; text-decoration: none">
+                        <img class="country-select-flag" src="http://c.masterleague.net/static/languages/flags/en.png" />
+                    </a>
+                
+                    <a href="#" class="setlang" title="Russian" data-lang-code="ru" style="margin-right: 2px; text-decoration: none">
+                        <img class="country-select-flag" src="http://c.masterleague.net/static/languages/flags/ru.png" />
+                    </a>
+                
+                    <a href="#" class="setlang" title="German" data-lang-code="de" style="margin-right: 2px; text-decoration: none">
+                        <img class="country-select-flag" src="http://c.masterleague.net/static/languages/flags/de.png" />
+                    </a>
+                
+                    <a href="#" class="setlang" title="Spanish" data-lang-code="es" style="margin-right: 2px; text-decoration: none">
+                        <img class="country-select-flag" src="http://c.masterleague.net/static/languages/flags/es.png" />
+                    </a>
+                
+                    <a href="#" class="setlang" title="Polish" data-lang-code="pl" style="margin-right: 2px; text-decoration: none">
+                        <img class="country-select-flag" src="http://c.masterleague.net/static/languages/flags/pl.png" />
+                    </a>
+                
+                    <a href="#" class="setlang" title="Traditional Chinese" data-lang-code="zh-hant" style="margin-right: 2px; text-decoration: none">
+                        <img class="country-select-flag" src="http://c.masterleague.net/static/languages/flags/zh-hant.png" />
+                    </a>
+                
+                    <a href="#" class="setlang" title="Simplified Chinese" data-lang-code="zh-hans" style="margin-right: 2px; text-decoration: none">
+                        <img class="country-select-flag" src="http://c.masterleague.net/static/languages/flags/zh-hans.png" />
+                    </a>
+                
+                <a href="https://poeditor.com/join/project/6tJYc0b52P" target="_blank" style="margin-left: 5px">
+                    Help us localize the site!
+                </a>
+            </div>
+            <div class="col-sm-6">
+                <form action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_top" class="pull-right">
+                <input type="hidden" name="cmd" value="_s-xclick">
+                <input type="hidden" name="encrypted" value="-----BEGIN PKCS7-----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-----END PKCS7-----">
+                <input type="image" src="https://www.paypalobjects.com/en_US/i/btn/btn_donate_SM.gif" border="0" name="submit" alt="PayPal - The safer, easier way to pay online!">
+                <img alt="" border="0" src="https://www.paypalobjects.com/ru_RU/i/scr/pixel.gif" width="1" height="1">
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Yandex.Metrika counter -->
+    <script type="text/javascript">
+        (function (d, w, c) {
+            (w[c] = w[c] || []).push(function() {
+                try {
+                    w.yaCounter37315365 = new Ya.Metrika({
+                        id:37315365,
+                        clickmap:true,
+                        trackLinks:true,
+                        accurateTrackBounce:true
+                    });
+                } catch(e) { }
+            });
+
+            var n = d.getElementsByTagName("script")[0],
+                s = d.createElement("script"),
+                f = function () { n.parentNode.insertBefore(s, n); };
+            s.type = "text/javascript";
+            s.async = true;
+            s.src = "https://mc.yandex.ru/metrika/watch.js";
+
+            if (w.opera == "[object Opera]") {
+                d.addEventListener("DOMContentLoaded", f, false);
+            } else { f(); }
+        })(document, window, "yandex_metrika_callbacks");
+    </script>
+    <noscript><div><img src="https://mc.yandex.ru/watch/37315365" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
+    <!-- /Yandex.Metrika counter -->
+</body>
+</html>
