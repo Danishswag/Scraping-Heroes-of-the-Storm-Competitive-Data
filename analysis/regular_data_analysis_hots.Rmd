@@ -1,0 +1,213 @@
+---
+title: "Reproducible Data Analysis of Heroes of the Storm Competitive Data"
+author: "Danishswag"
+output: html_notebook
+---
+
+While the purpose of data analysis should be to tell a story, this R notebook
+should provide a good starting point for analyzing Heroes of the Storm (HotS)
+competitive data. The idea is to make a report that I (or anyone else)
+can run on a regular basis to evaluate the teams and players in the competitive
+scene. Note that some matches in the `player_details` table have flipped team
+names which may lead to slightly inconsistent results compared to the
+Master League data. Send me a message or make a pull request if you notice
+anything wrong :)
+
+As usual, everything is under the MIT license like the rest of the repository,
+so make sure to give me attribution if you use anything here.
+
+# Setup
+```{r}
+require("sqldf")
+require("ggplot2")
+require("PlayerRatings")
+require("htmlTable")
+```
+
+Setting up the connection to the SQLite database.
+
+```{r}
+db = dbConnect(SQLite(), dbname = "../hots_scrapy/HotSCompetitive.sqlite")
+```
+
+
+# Blizzard Statistics
+
+On the [HGC Website](http://us.heroesofthestorm.com/esports/en/), Blizzard
+often puts up [statistics from the previous weekend of games](http://us.heroesofthestorm.com/esports/en/news/20529704/stats-snapshot:-week-3).
+Running the code below should give us the same information. The replay files
+from Korea tend to go up on the server late, so Korean values that depend on
+detailed information like hero damage are less reliable.
+
+## Highest Average Number of Kills by Region
+
+You can check yourself the lookup tables, but Korea's HGC ID is 37.
+
+```{sql, connection=db}
+SELECT * FROM (SELECT deets.player_name, AVG(deets.kills) AS average_kills, 
+r.name AS region FROM player_details deets
+JOIN match_basic basic ON deets.match_id=basic.match_id
+JOIN tournaments t ON basic.tournament=t.id
+JOIN region r ON t.region=r.id
+WHERE basic.tournament = 37
+GROUP BY deets.player_name, r.name ORDER BY AVG(deets.kills) DESC
+LIMIT 1 )
+
+UNION
+
+SELECT * FROM (SELECT deets.player_name, AVG(deets.kills) AS average_kills,
+r.name AS region FROM player_details deets
+JOIN match_basic basic ON deets.match_id=basic.match_id
+JOIN tournaments t ON basic.tournament=t.id
+JOIN region r ON t.region=r.id
+WHERE basic.tournament = 33
+GROUP BY deets.player_name, r.name ORDER BY AVG(deets.kills) DESC
+LIMIT 1)
+
+UNION
+
+SELECT * FROM (SELECT deets.player_name, AVG(deets.kills) AS average_kills,
+r.name AS region FROM player_details deets
+JOIN match_basic basic ON deets.match_id=basic.match_id
+JOIN tournaments t ON basic.tournament=t.id
+JOIN region r ON t.region=r.id
+WHERE basic.tournament = 32
+GROUP BY deets.player_name, r.name ORDER BY AVG(deets.kills) DESC
+LIMIT 1)
+```
+
+# Team Statistics
+## Glicko Ratings
+
+We need to pull out the data for the glicko code.
+```{r}
+glicko.df <- sqldf("select week,
+                      home_team,
+                      away_team,
+                      score 
+                    from match_basic", conn=db)
+```
+
+In this section we are going to generate the Glicko ratings for all of the
+teams in the league. This section will only output the top ten teams. In
+order to actually make predictions, these ratings will have to be passed into
+another script.
+
+```{r}
+glicko.ratings <- glicko(glicko.df)
+
+# Exporting ratings and printing the top 20 teams
+htmlTable(txtRound(glicko.ratings$ratings[1:20, ], 0))
+glicko.ratings$ratings[1:20, ]
+```
+
+## Shortest and Longest Average Match Duration
+There is only duration data for some matches, so this is certainly not a
+perfect calculation. It includes data since Sep. 1st, 2016. If you want
+to see the shortest durations, switch `DESC` to `ASC`.
+
+```{sql, connection=db}
+SELECT team_name, AVG(duration) AS avg_duration, COUNT(team_name) AS matches
+FROM
+(
+SELECT home_team AS team_name, duration
+  FROM match_basic
+  WHERE duration IS NOT NULL
+  AND DATE > '2016-09-01'
+UNION ALL
+
+SELECT away_team AS team_name, duration
+  FROM match_basic
+  WHERE duration IS NOT NULL
+    AND date > date('now', 'start of month', '-6 months')
+)
+GROUP BY team_name
+HAVING count(team_name) > 10
+ORDER BY AVG(duration) DESC
+LIMIT 10
+```
+
+## Most Banned Against
+The idea here is to calculate which characters are banned the most
+against a given team in the last 6 months.
+
+```{sql, connection=db}
+SELECT ban AS most_banned, COUNT(ban) AS frequency FROM (
+    SELECT CASE WHEN home_team = 'Fnatic' THEN home_ban1 ELSE (
+        CASE WHEN away_team = 'Fnatic' THEN away_ban1 END) END AS ban
+    FROM match_basic
+    WHERE home_team = 'Fnatic' OR away_team = 'Fnatic'
+    
+    UNION ALL
+    
+    SELECT CASE WHEN home_team = 'Fnatic' THEN home_ban2 ELSE (
+        CASE WHEN away_team = 'Fnatic' THEN away_ban2 END) END AS ban
+    FROM match_basic
+    WHERE (home_team = 'Fnatic' OR away_team = 'Fnatic')
+      AND date > date('now', 'start of month', '-6 months')
+    )
+GROUP BY ban
+ORDER BY COUNT(ban) DESC LIMIT 10
+```
+
+# Player Level Statistics
+## Finding the 'Hero Pool'
+I define the hero pool as all characters with which someone has great than a
+50% win rate with, although this is dependent on the quality of the team. To
+account for this, I also allow a hero to count in a player's hero pool if
+they have played them more than 10 times in competitive play.
+```{sql, connection=db}
+SELECT hero_name,
+  COUNT(hero_name) as num_matches,
+  SUM(is_win)*1.0 / COUNT(is_win) * 100 AS win_percent
+  FROM
+    (
+    SELECT d.hero_name,
+        CASE WHEN ((m.score = 0 AND m.away_team = d.team_name)
+                    OR (m.score = 1 AND m.home_team = d.team_name))
+            THEN 1
+            ELSE 0 END AS is_win
+    FROM player_details d
+    JOIN match_basic m ON d.match_id = m.match_id
+	  WHERE d.player_name = 'Swoy'
+    )
+  GROUP BY hero_name
+  HAVING SUM(is_win)*1.0 / COUNT(is_win) >= 0.5
+      OR COUNT(hero_name) >= 10
+  ORDER BY SUM(is_win)*1.0 / COUNT(is_win) DESC
+  LIMIT 10
+```
+
+## Finding the Players with the Highest Win Rates
+These will mostly be based on what teams players are a part of, especially
+in the early days of this competitive scene. Later on though, it may be
+make it possible to discern which player is actually helping a team win.
+```{sql, connection=db}
+SELECT player_name,
+  SUM(is_win)*1.0 / COUNT(*) AS win_rate,
+  count(*) AS matches_played
+  FROM
+  (
+    SELECT m.match_id,
+        m.date,
+        d.team_name,
+        d.player_name,
+        d.hero_name,
+        CASE WHEN ((m.score = 0 AND m.away_team = d.team_name)
+                    OR (m.score = 1 AND m.home_team = d.team_name))
+            THEN 1
+            ELSE 0 END AS is_win
+    FROM player_details d
+    JOIN match_basic m on d.match_id = m.match_id
+  )
+  GROUP BY player_name
+  HAVING COUNT(*) > 30
+  ORDER BY SUM(is_win)*1.0 / COUNT(*) DESC
+  LIMIT 10
+```
+
+# Final Steps
+Make sure to always close your connection to the database to be polite.
+```{r}
+dbDisconnect(db)
+```

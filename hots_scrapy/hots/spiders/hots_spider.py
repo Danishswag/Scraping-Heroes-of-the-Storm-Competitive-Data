@@ -6,10 +6,12 @@ from hots.items import HotsItem  # The item I created earlier
 class HotsSpider(scrapy.Spider):
     # Basic spider information
     name = "hots"
-    allowed_domains = ["masterleague.net"]
-    start_urls = [
-        'https://masterleague.net/match/1960'
-    ]
+
+    def __init__(self, match_id=2038, *args, **kwargs):
+        self.allowed_domains = ["masterleague.net"]
+        self.start_urls = [
+            'https://masterleague.net/match/{}/'.format(match_id)
+        ]
 
     def parse(self, response):
         item = HotsItem()
@@ -68,7 +70,7 @@ class HotsSpider(scrapy.Spider):
 
                 # Away Player 1
                 item['away_p1'] = pdata.xpath('div[2]/div[1]/a[2]/text()').extract_first()
-                item['away_p1_hero'] = pdata.xpath('div[2]/div[1]/a[1]/img/@title').extract_first() 
+                item['away_p1_hero'] = pdata.xpath('div[2]/div[1]/a[1]/img/@title').extract_first()
 
                 # Away Player 2
                 item['away_p2'] = pdata.xpath('div[2]/div[2]/a[2]/text()').extract_first()
